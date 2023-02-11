@@ -13,7 +13,7 @@ add_library(sqlite3 STATIC src/sqlite3.c ${SRC})
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
-include_directories(include)
+target_include_directories(sqlite3 PUBLIC include)
 
 if(${BUILD_EXAMPLE})
     add_executable(main examples/ex.cpp)
