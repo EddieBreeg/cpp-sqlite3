@@ -81,7 +81,7 @@ namespace SQLite3
     {
     private:
         sqlite3_stmt* _s = nullptr;
-        sqlite3* _db;
+        sqlite3* _db = nullptr;
 
         template<typename T>
         error_code _bind_params_impl(int index, const T& val){
@@ -171,6 +171,7 @@ namespace SQLite3
         Statement(sqlite3* db, std::string_view sql, std::string_view& tail, error_code& ec);
         Statement(const Statement&) = delete;
         Statement(Statement&& other);
+        Statement() = default;
         Statement& operator=(const Statement&) = delete;
         Statement& operator=(Statement&& other);
         ~Statement();
