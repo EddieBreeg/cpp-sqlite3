@@ -90,7 +90,7 @@ namespace SQLite3
         template<typename T, typename... Args>
         error_code _bind_params_impl(int index, const T& first, const Args... others){
             auto rc = bindParam(index, first);
-            if(rc == SQLite3Error::ERROR) return rc;
+            if(rc == SQLite3Error::Error) return rc;
             return _bind_params_impl(index+1, others...);
         }
     public:

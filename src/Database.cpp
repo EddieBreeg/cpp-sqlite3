@@ -53,7 +53,7 @@ namespace SQLite3
 
     error_code Database::execute(std::string_view sql) {
         int ec = sqlite3_exec(_db, sql.data(), nullptr, nullptr, nullptr);
-        if(!ec) return error_code(SQLite3Error::OK);
+        if(!ec) return error_code(SQLite3Error::Ok);
         error_code r(SQLite3Error(ec), sqlite3_errmsg(_db));
         return r;
     }

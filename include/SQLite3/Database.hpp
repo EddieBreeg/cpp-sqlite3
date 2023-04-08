@@ -75,13 +75,13 @@ namespace SQLite3
                     continue;
                 while(1){
                     auto res = s(ec);
-                    if(ec == SQLite3Error::DONE)
+                    if(ec == SQLite3Error::Done)
                         break;
-                    else if(ec != SQLite3Error::ROW)
+                    else if(ec != SQLite3Error::Row)
                         return ec;
                     error_code ec2 = callback(res, args...);
-                    if(ec2 != SQLite3Error::OK) 
-                        return SQLite3Error::ABORT;
+                    if(ec2 != SQLite3Error::Ok) 
+                        return SQLite3Error::Abort;
                 }
             }
             return error_code{};

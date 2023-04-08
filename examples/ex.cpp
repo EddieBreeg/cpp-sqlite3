@@ -11,22 +11,22 @@ for obvious security reasons!
 #include <string>
 
 SQLite3::error_code printPost(const SQLite3::QueryResult& res){
-    if(!res.columns()) return SQLite3::ABORT;
+    if(!res.columns()) return SQLite3::SQLite3Error::Abort;
     std::cout << res.at<std::string_view>(0) /* author's name */ << " wrote: "
     << res.at<std::string_view>(1) /* content */ << '\n';
-    return SQLite3::OK;
+    return SQLite3::SQLite3Error::Ok;
 }
 SQLite3::error_code fetchUserId(const SQLite3::QueryResult& res, int& id){
-    if(!res.columns()) return SQLite3::ABORT;
+    if(!res.columns()) return SQLite3::SQLite3Error::Abort;
     id = res.at<int32_t>(0);
-    return SQLite3::OK;
+    return SQLite3::SQLite3Error::Ok;
 }
 
 SQLite3::error_code createPost(SQLite3::Database& db, int userId){
     std::string postContent;
     std::cout << "Wanna say something?\nPost: ";
     std::getline(std::cin, postContent);
-    if(postContent.empty()) return SQLite3::DONE;
+    if(postContent.empty()) return SQLite3::SQLite3Error::Done;
     auto st = db.createStatement("insert into posts (content, author_id) values (?, ?)");
     st.bindParams(postContent, userId);
     SQLite3::error_code ec;
@@ -59,7 +59,7 @@ int main(int argc, char const *argv[])
     "author_id integer not null,"
     "foreign key(author_id) references users(id)"
     ")");
-    if(err && err != SQLite3::ERROR /* Tables couldn't be created, but not because of a SQL error */){
+    if(err && err != SQLite3::SQLite3Error::Error /* Tables couldn't be created, but not because of a SQL error */){
         std::cerr << "Couldn't create tables: " << err.what() << '\n';
         return 1;
     }
@@ -77,11 +77,11 @@ int main(int argc, char const *argv[])
     st.bindParams(username);
     auto result = st(err);
     int userId = 0;
-    if(err == SQLite3::DONE){ // no user with that name was found
+    if(err == SQLite3::SQLite3Error::Done){ // no user with that name was found
         st = db.createStatement("insert into users (name,password) values (?,?)");
         st.bindParams(username, pwd);
         st(err);
-        if(err != SQLite3::DONE){
+        if(err != SQLite3::SQLite3Error::Done){
             std::cout << "Uh, something went wrong when signing you up: " << err.what() << '\n';
             return 1;
         }
@@ -89,7 +89,7 @@ int main(int argc, char const *argv[])
         db.execute<decltype(fetchUserId), int&>("select id from users order by id desc limit 1", 
             fetchUserId, userId); // fetch the newly created id
     }
-    else if(err == SQLite3::ROW){ // some user was found
+    else if(err == SQLite3::SQLite3Error::Row){ // some user was found
         userId = result.at<int32_t>(0);
         auto pass = result.at<std::string_view>(1);
         if(pwd != pass) // wrong password 
@@ -100,7 +100,7 @@ int main(int argc, char const *argv[])
         std::cout << "Welcome back " << username << "!\n";
     }
     err = createPost(db, userId);
-    if(err != SQLite3::DONE){
+    if(err != SQLite3::SQLite3Error::Done){
         std::cerr << "Oops, something went wrong: " << err.what() << '\n';
         return 1;
     }
